@@ -381,6 +381,12 @@ The Docker image workflow has passed with AWS OIDC authentication, ECR login, im
 
 ![Docker build and push workflow passing](docs/screenshots/docker-build-push-success.png)
 
+### ECS Deploy
+
+The ECS deploy workflow has passed with GitHub Actions OIDC authentication, Terraform init, and Terraform apply completed successfully.
+
+![ECS deploy workflow passing](docs/screenshots/deploy-ecs-success.png)
+
 ---
 
 ## Troubleshooting and Operations
