@@ -1,20 +1,18 @@
-# Gatus ECS Platform Project
+# Gatus on ECS with Terraform
 
-An AWS ECS monitoring platform built with Terraform, GitHub Actions, and minimal secure container delivery.
+This repo is my AWS ECS project for running [Gatus](https://github.com/TwiN/gatus) on Fargate.
 
-This project deploys [Gatus](https://github.com/TwiN/gatus), a lightweight uptime and status monitoring tool, onto AWS ECS Fargate.
+Terraform builds the AWS infrastructure, GitHub Actions builds and deploys the container image, and Cloudflare DNS points the public hostname at the load balancer.
 
-The goal is to build a small, understandable container platform around a real workload, covering private networking, image delivery, load balancing, TLS, basic logging, and CI/CD without relying on long-lived AWS credentials.
+I kept the first working version deliberately small so the full path is easy to follow: private ECS tasks, an internet-facing ALB, TLS, ECR image delivery, application logs, and CI/CD using OIDC instead of long-lived AWS keys.
 
----
-
-## What This Project Builds
+## What It Builds
 
 ![Gatus ECS Platform Architecture](docs/architecture.svg)
 
 Editable diagrams.net source: [docs/architecture.drawio](docs/architecture.drawio).
 
-The platform currently provisions:
+The project creates:
 
 - A custom AWS VPC in `eu-west-2`.
 - Public and private subnets across two Availability Zones.
@@ -29,9 +27,23 @@ The platform currently provisions:
 
 The latest verified deployment is running image tag `291c1b4` from ECR on ECS task definition `gatus-task:20`. The ECS service is active with `1/1` Fargate task running, and the ALB target group has a healthy target on port `8080`.
 
----
+## Live URL
 
-## What I Have Implemented So Far
+The live Gatus dashboard is available at:
+
+```text
+https://gatus.appjojocloud.com
+```
+
+Cloudflare manages DNS for `appjojocloud.com`. The `gatus` subdomain points to the AWS ALB DNS name:
+
+```text
+gatus-alb-788617860.eu-west-2.elb.amazonaws.com
+```
+
+The ALB redirects HTTP traffic to HTTPS and uses the ACM certificate issued for `gatus.appjojocloud.com`.
+
+## What I Built
 
 ### AWS Infrastructure with Terraform
 
@@ -77,8 +89,6 @@ The latest verified deployment is running image tag `291c1b4` from ECR on ECS ta
 - Terraform CI workflow runs format, init, validate, TFLint, and Checkov.
 - Manual ECS deployment workflow accepts an image tag and applies Terraform.
 
----
-
 ## Repository Structure
 
 ```text
@@ -118,8 +128,6 @@ The latest verified deployment is running image tag `291c1b4` from ECR on ECS ta
         `-- terraform-ci.yml
 ```
 
----
-
 ## Tech Stack
 
 - AWS
@@ -137,8 +145,6 @@ The latest verified deployment is running image tag `291c1b4` from ECR on ECS ta
 - TFLint
 - Checkov
 - Trivy
-
----
 
 ## Local Setup for Developers
 
@@ -251,8 +257,6 @@ terraform destroy \
 
 The OIDC layer is intentionally separate from the main app infrastructure. Keeping it separate means CI/CD access can survive app teardown, which avoids breaking GitHub Actions every time the ECS environment is destroyed.
 
----
-
 ## Deployment Flow
 
 ### 1. Bootstrap GitHub Actions OIDC
@@ -347,8 +351,6 @@ The latest verified ECS deployment uses:
 
 The service is active with one desired task and one running task.
 
----
-
 ## Current Gatus Configuration
 
 The current Gatus config includes a local self-check and public social website checks:
@@ -386,8 +388,6 @@ endpoints:
 
 This can be expanded with more internal and external service checks as the platform grows.
 
----
-
 ## Validation and Security Checks
 
 Terraform CI currently runs:
@@ -407,8 +407,6 @@ The image pipeline currently runs:
 - ECR push only after the scan passes
 
 The Terraform CI and Docker image workflows can also be started manually from GitHub Actions using `workflow_dispatch`.
-
----
 
 ## Pipeline Evidence
 
@@ -447,8 +445,6 @@ The deployed Gatus dashboard is reachable over HTTPS through Cloudflare DNS and 
 
 ![Live Gatus dashboard over HTTPS](docs/screenshots/gatus-live-site.png)
 
----
-
 ## Troubleshooting and Operations
 
 Issues worked through during the build include:
@@ -462,23 +458,16 @@ Issues worked through during the build include:
 - Keeping the first working version intentionally minimal so the deployment path is easy to understand.
 - Handling Checkov findings with explicit rationale where appropriate.
 
----
-
-## Current Focus
+## Future Plans
 
 - Adding more meaningful internal and external Gatus checks.
-- Capturing final AWS console evidence for ECR, ECS service health, ALB listeners, target health, and the live app.
-- Confirming the Cloudflare DNS record points at the current ALB DNS name.
+- Adding final AWS console evidence for ECR, ECS service health, ALB listeners, target health, and the live app.
 - Adding ECS autoscaling policies.
 - Considering VPC endpoints to reduce NAT dependency.
 - Adding optional edge protection and deeper network logging as a later hardening phase.
 - Splitting environments beyond the current dev setup.
 - Documenting the operational runbook for releases and rollbacks.
 
----
-
 ## Why This Project
 
-This project is focused on building real AWS platform engineering skills around a practical workload. It covers infrastructure as code, private networking, container deployment, IAM, CI/CD, TLS, basic logging, security scanning, and operational troubleshooting in one small but realistic system.
-
-More updates will be added as the platform evolves.
+I built this to practise the full path from Terraform to a real running container service. It covers the parts I wanted to get hands-on with: private networking, ECS Fargate, IAM, ECR, ALB routing, TLS, GitHub Actions OIDC, image scanning, Terraform checks, and the day-to-day troubleshooting that comes with wiring all of it together.
