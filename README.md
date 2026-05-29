@@ -25,11 +25,11 @@ The project creates:
 - CloudWatch logging for ECS application logs.
 - GitHub Actions OIDC roles for ECR pushes and Terraform deploys.
 
-The latest verified deployment is running image tag `291c1b4` from ECR on ECS task definition `gatus-task:20`. The ECS service is active with `1/1` Fargate task running, and the ALB target group has a healthy target on port `8080`.
+The project has been deployed successfully with image tag `291c1b4` from ECR on ECS task definition `gatus-task:20`. That deployment was later removed with the manual destroy workflow, which is included as evidence in this README.
 
 ## Live URL
 
-The live Gatus dashboard is available at:
+When the app infrastructure is deployed, the Gatus dashboard is available at:
 
 ```text
 https://gatus.appjojocloud.com
@@ -42,6 +42,8 @@ gatus-alb-788617860.eu-west-2.elb.amazonaws.com
 ```
 
 The ALB redirects HTTP traffic to HTTPS and uses the ACM certificate issued for `gatus.appjojocloud.com`.
+
+After the destroy workflow has run, the hostname remains configured in Cloudflare but the app will not be available until Terraform recreates the app layer.
 
 ## What I Built
 
@@ -103,6 +105,7 @@ The ALB redirects HTTP traffic to HTTPS and uses the ACM certificate issued for 
 |   |-- architecture.svg
 |   `-- screenshots/
 |       |-- deploy-ecs-success.png
+|       |-- destroy-workflow-success.png
 |       |-- docker-build-push-success.png
 |       |-- gatus-live-site.png
 |       |-- target-group-healthy.png
@@ -348,13 +351,13 @@ terraform output alb_dns_name
 
 Point the Cloudflare DNS record for the chosen hostname at the ALB DNS name.
 
-The latest verified ECS deployment uses:
+The latest verified ECS deployment used:
 
 ```text
 965384155823.dkr.ecr.eu-west-2.amazonaws.com/gatus-repo:291c1b4
 ```
 
-The service is active with one desired task and one running task.
+The service was active with one desired task and one running task before the destroy workflow was run.
 
 ### 6. Tear Down the App Infrastructure
 
@@ -446,22 +449,28 @@ The ECS deploy workflow has passed with GitHub Actions OIDC authentication, Terr
 
 ![ECS deploy workflow passing](docs/screenshots/deploy-ecs-success.png)
 
+### Destroy Workflow
+
+The destroy workflow has passed after a manual confirmation. It ran Terraform destroy for the app infrastructure while leaving the separate OIDC bootstrap layer in place.
+
+![Destroy workflow passing](docs/screenshots/destroy-workflow-success.png)
+
 ### AWS Runtime Checks
 
-The deployed AWS resources have also been checked from the AWS side:
+Before teardown, the deployed AWS resources were also checked from the AWS side:
 
 - ECR contains image tag `291c1b4`.
-- ECS service `gatus-service` is active with `1` desired task and `1` running task.
+- ECS service `gatus-service` was active with `1` desired task and `1` running task.
 - ALB listener `HTTP:80` redirects to `HTTPS:443`.
 - ALB listener `HTTPS:443` forwards traffic to target group `gatus-tg`.
-- Target group `gatus-tg` has one healthy ECS task target on port `8080`.
-- The live HTTPS endpoint `https://gatus.appjojocloud.com` returns `200`.
+- Target group `gatus-tg` had one healthy ECS task target on port `8080`.
+- The HTTPS endpoint `https://gatus.appjojocloud.com` returned `200`.
 
 ![ALB target group healthy](docs/screenshots/target-group-healthy.png)
 
 ### Live Gatus Dashboard
 
-The deployed Gatus dashboard is reachable over HTTPS through Cloudflare DNS and the public ALB. The live dashboard shows the local self check plus Facebook, X, and Instagram endpoint checks as healthy.
+Before teardown, the Gatus dashboard was reachable over HTTPS through Cloudflare DNS and the public ALB. The dashboard showed the local self check plus Facebook, X, and Instagram endpoint checks as healthy.
 
 ![Live Gatus dashboard over HTTPS](docs/screenshots/gatus-live-site.png)
 
