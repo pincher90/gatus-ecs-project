@@ -27,6 +27,8 @@ The platform currently provisions:
 - CloudWatch logging for ECS application logs.
 - GitHub Actions OIDC roles for ECR pushes and Terraform deploys.
 
+The latest verified deployment is running image tag `291c1b4` from ECR on ECS task definition `gatus-task:20`. The ECS service is active with `1/1` Fargate task running, and the ALB target group has a healthy target on port `8080`.
+
 ---
 
 ## What I Have Implemented So Far
@@ -61,7 +63,7 @@ The platform currently provisions:
 - Multi-stage Dockerfile that builds Gatus from source.
 - Minimal `scratch` runtime image.
 - Non-root container user.
-- Gatus configuration stored in `app/config/config.yaml`.
+- Gatus configuration stored in `app/config/config.yaml` with local and public website checks.
 - ECR repository with immutable tags.
 - Image scanning enabled on push.
 - Trivy scan in the Docker build workflow.
@@ -85,6 +87,13 @@ The platform currently provisions:
 |   |-- Dockerfile
 |   `-- config/
 |       `-- config.yaml
+|-- docs/
+|   |-- architecture.drawio
+|   |-- architecture.svg
+|   `-- screenshots/
+|       |-- deploy-ecs-success.png
+|       |-- docker-build-push-success.png
+|       `-- terraform-ci-success.png
 |-- infra/
 |   |-- envs/
 |   |   `-- dev.tfvars
@@ -304,6 +313,8 @@ It will:
 - Scan the image with Trivy.
 - Push the image to ECR.
 
+The current ECR repository contains successful image tags `cc4e35d` and `291c1b4`. The latest image, `291c1b4`, was built after adding the public social endpoint checks.
+
 ### 5. Deploy to ECS
 
 The ECS deploy workflow is manually triggered with an image tag.
@@ -327,11 +338,19 @@ terraform output alb_dns_name
 
 Point the Cloudflare DNS record for the chosen hostname at the ALB DNS name.
 
+The latest verified ECS deployment uses:
+
+```text
+965384155823.dkr.ecr.eu-west-2.amazonaws.com/gatus-repo:291c1b4
+```
+
+The service is active with one desired task and one running task.
+
 ---
 
 ## Current Gatus Configuration
 
-The current Gatus config is intentionally small while the infrastructure is being built out:
+The current Gatus config includes a local self-check and public social website checks:
 
 ```yaml
 endpoints:
@@ -341,9 +360,30 @@ endpoints:
     interval: 30s
     conditions:
       - "[STATUS] == 200"
+
+  - name: Facebook
+    group: Social
+    url: "https://www.facebook.com"
+    interval: 1m
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: X
+    group: Social
+    url: "https://x.com"
+    interval: 1m
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: Instagram
+    group: Social
+    url: "https://www.instagram.com"
+    interval: 1m
+    conditions:
+      - "[STATUS] == 200"
 ```
 
-This can be expanded with real internal and external service checks as the platform grows.
+This can be expanded with more internal and external service checks as the platform grows.
 
 ---
 
@@ -364,6 +404,8 @@ The image pipeline currently runs:
 - Docker build for `linux/amd64`
 - Trivy vulnerability scan for `CRITICAL` and `HIGH` findings
 - ECR push only after the scan passes
+
+The Terraform CI and Docker image workflows can also be started manually from GitHub Actions using `workflow_dispatch`.
 
 ---
 
@@ -387,6 +429,16 @@ The ECS deploy workflow has passed with GitHub Actions OIDC authentication, Terr
 
 ![ECS deploy workflow passing](docs/screenshots/deploy-ecs-success.png)
 
+### AWS Runtime Checks
+
+The deployed AWS resources have also been checked from the AWS side:
+
+- ECR contains image tag `291c1b4`.
+- ECS service `gatus-service` is active with `1` desired task and `1` running task.
+- ALB listener `HTTP:80` redirects to `HTTPS:443`.
+- ALB listener `HTTPS:443` forwards traffic to target group `gatus-tg`.
+- Target group `gatus-tg` has a healthy IP target on port `8080`.
+
 ---
 
 ## Troubleshooting and Operations
@@ -406,10 +458,10 @@ Issues worked through during the build include:
 
 ## Current Focus
 
-- Expanding the Gatus endpoint configuration.
-- Adding a custom domain record through Cloudflare.
+- Adding more meaningful internal and external Gatus checks.
+- Capturing final AWS console evidence for ECR, ECS service health, ALB listeners, target health, and the live app.
+- Confirming the Cloudflare DNS record points at the current ALB DNS name.
 - Adding ECS autoscaling policies.
-- Adding CloudWatch alarms for ECS, ALB, and target health.
 - Considering VPC endpoints to reduce NAT dependency.
 - Adding optional edge protection and deeper network logging as a later hardening phase.
 - Splitting environments beyond the current dev setup.
