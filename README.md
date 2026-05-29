@@ -4,7 +4,7 @@ This repo is my AWS ECS project for running [Gatus](https://github.com/TwiN/gatu
 
 Terraform builds the AWS infrastructure, GitHub Actions builds and deploys the container image, and Cloudflare DNS points the public hostname at the load balancer.
 
-I kept the first working version deliberately small so the full path is easy to follow: private ECS tasks, an internet-facing ALB, TLS, ECR image delivery, application logs, and CI/CD using OIDC instead of long-lived AWS keys.
+I kept the first working version deliberately small so the full path is easy to follow: private ECS tasks, a public ALB, TLS, ECR image delivery, application logs, and CI/CD using OIDC instead of long lived AWS keys.
 
 ## What It Builds
 
@@ -20,7 +20,7 @@ The project creates:
 - NAT Gateway for private subnet outbound access.
 - ECS Fargate cluster and service running Gatus.
 - Public Application Load Balancer with HTTP to HTTPS redirect.
-- ACM-backed HTTPS listener.
+- HTTPS listener backed by ACM.
 - ECR repository for immutable Gatus images.
 - CloudWatch logging for ECS application logs.
 - GitHub Actions OIDC roles for ECR pushes and Terraform deploys.
@@ -49,9 +49,9 @@ The ALB redirects HTTP traffic to HTTPS and uses the ACM certificate issued for 
 
 - Modular Terraform layout for VPC, security groups, ALB, ECS, and ECR.
 - Remote Terraform state stored in S3.
-- Environment-specific values in `infra/envs/dev.tfvars`.
+- Environment specific values in `infra/envs/dev.tfvars`.
 - Public and private route tables with subnet associations.
-- Minimal baseline security focused on private ECS tasks, security groups, TLS, and short-lived CI/CD credentials.
+- Minimal baseline security focused on private ECS tasks, security groups, TLS, and short lived CI/CD credentials.
 
 ### Container Platform on ECS
 
@@ -62,19 +62,19 @@ The ALB redirects HTTP traffic to HTTPS and uses the ACM certificate issued for 
 - Security group access limited to ALB traffic on port `8080`.
 - CloudWatch log group for application logs with 365 day retention.
 
-### Load Balancing, TLS, and Edge Security
+### Load Balancing and TLS
 
 - Public Application Load Balancer across public subnets.
 - HTTP listener on port `80` redirecting to HTTPS.
 - HTTPS listener on port `443` forwarding to the ECS target group.
 - External ACM certificate support for domains managed in Cloudflare.
-- Optional edge and network logging controls can be added later as a hardening phase.
+- Optional public access protections and network logging can be added later as a hardening phase.
 
 ### Image Build and Delivery
 
-- Multi-stage Dockerfile that builds Gatus from source.
+- Multi stage Dockerfile that builds Gatus from source.
 - Minimal `scratch` runtime image.
-- Non-root container user.
+- Non root container user.
 - Gatus configuration stored in `app/config/config.yaml` with local and public website checks.
 - ECR repository with immutable tags.
 - Image scanning enabled on push.
@@ -83,9 +83,9 @@ The ALB redirects HTTP traffic to HTTPS and uses the ACM certificate issued for 
 ### GitHub Actions and OIDC
 
 - GitHub Actions authenticates to AWS with OpenID Connect.
-- No long-lived AWS access keys are required by workflows.
+- No long lived AWS access keys are required by workflows.
 - Dedicated role for Docker image pushes to ECR.
-- Dedicated role for Terraform-based ECS deploys.
+- Dedicated role for Terraform based ECS deploys.
 - Terraform CI workflow runs format, init, validate, TFLint, and Checkov.
 - Manual ECS deployment workflow accepts an image tag and applies Terraform.
 
@@ -204,7 +204,7 @@ This is useful for checking syntax and module wiring before running a real deplo
 
 ### Reproduce the Full AWS Setup
 
-To deploy your own copy of the full platform, update the repository-specific values first:
+To deploy your own copy of the full platform, update the repository specific values first:
 
 - `infra/backend.tf` and `infra/oidc/backend.tf`: use your own S3 state bucket and state keys.
 - `infra/oidc/variables.tf`: update `github_owner`, `github_repo`, and `github_subjects`.
@@ -353,7 +353,7 @@ The service is active with one desired task and one running task.
 
 ## Current Gatus Configuration
 
-The current Gatus config includes a local self-check and public social website checks:
+The current Gatus config includes a local self check and public social website checks:
 
 ```yaml
 endpoints:
@@ -441,7 +441,7 @@ The deployed AWS resources have also been checked from the AWS side:
 
 ### Live Gatus Dashboard
 
-The deployed Gatus dashboard is reachable over HTTPS through Cloudflare DNS and the public ALB. The live dashboard shows the local self-check plus Facebook, X, and Instagram endpoint checks as healthy.
+The deployed Gatus dashboard is reachable over HTTPS through Cloudflare DNS and the public ALB. The live dashboard shows the local self check plus Facebook, X, and Instagram endpoint checks as healthy.
 
 ![Live Gatus dashboard over HTTPS](docs/screenshots/gatus-live-site.png)
 
@@ -454,7 +454,7 @@ Issues worked through during the build include:
 - Scoping GitHub OIDC trust to the `main` branch.
 - Bootstrapping ECR before the first Docker image push.
 - Handling ACM validation while DNS is managed outside AWS.
-- Wiring an HTTPS-only ALB flow to private ECS Fargate tasks.
+- Wiring an HTTPS only ALB flow to private ECS Fargate tasks.
 - Keeping the first working version intentionally minimal so the deployment path is easy to understand.
 - Handling Checkov findings with explicit rationale where appropriate.
 
@@ -464,10 +464,10 @@ Issues worked through during the build include:
 - Adding final AWS console evidence for ECR, ECS service health, ALB listeners, target health, and the live app.
 - Adding ECS autoscaling policies.
 - Considering VPC endpoints to reduce NAT dependency.
-- Adding optional edge protection and deeper network logging as a later hardening phase.
+- Adding optional public access protection and deeper network logging as a later hardening phase.
 - Splitting environments beyond the current dev setup.
 - Documenting the operational runbook for releases and rollbacks.
 
 ## Why This Project
 
-I built this to practise the full path from Terraform to a real running container service. It covers the parts I wanted to get hands-on with: private networking, ECS Fargate, IAM, ECR, ALB routing, TLS, GitHub Actions OIDC, image scanning, Terraform checks, and the day-to-day troubleshooting that comes with wiring all of it together.
+I built this to practise the full path from Terraform to a real running container service. It covers the parts I wanted to work through properly: private networking, ECS Fargate, IAM, ECR, ALB routing, TLS, GitHub Actions OIDC, image scanning, Terraform checks, and the day to day troubleshooting that comes with wiring all of it together.
