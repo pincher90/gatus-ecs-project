@@ -367,6 +367,16 @@ The image pipeline currently runs:
 
 ---
 
+## Pipeline Evidence
+
+### Terraform CI
+
+The Terraform CI workflow has passed with formatting, validation, TFLint, and Checkov checks completed successfully.
+
+![Terraform CI workflow passing](docs/screenshots/terraform-ci-success.png)
+
+---
+
 ## Troubleshooting and Operations
 
 Issues worked through during the build include:
