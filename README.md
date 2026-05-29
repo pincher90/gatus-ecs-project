@@ -88,6 +88,7 @@ The ALB redirects HTTP traffic to HTTPS and uses the ACM certificate issued for 
 - Dedicated role for Terraform based ECS deploys.
 - Terraform CI workflow runs format, init, validate, TFLint, and Checkov.
 - Manual ECS deployment workflow accepts an image tag and applies Terraform.
+- Manual destroy workflow tears down the app infrastructure only after a typed confirmation.
 
 ## Repository Structure
 
@@ -125,6 +126,7 @@ The ALB redirects HTTP traffic to HTTPS and uses the ACM certificate issued for 
 `-- .github/
     `-- workflows/
         |-- deploy-ecs.yml
+        |-- destroy-ecs.yml
         |-- docker-build-push.yml
         `-- terraform-ci.yml
 ```
@@ -246,7 +248,7 @@ ALB_CERTIFICATE_ARN
 7. Push an app change to `main` to trigger the Docker build and ECR push workflow.
 8. Run the `Deploy ECS` GitHub Actions workflow manually with the image tag produced by the Docker workflow.
 
-The AWS deployment creates paid resources such as a NAT Gateway, ALB, ECS Fargate tasks, and CloudWatch logs. Destroy the app layer when it is no longer needed:
+The AWS deployment creates paid resources such as a NAT Gateway, ALB, ECS Fargate tasks, and CloudWatch logs. Destroy the app layer when it is no longer needed. Locally, run:
 
 ```bash
 cd infra
@@ -255,6 +257,8 @@ terraform destroy \
   -var="image_tag=<image-tag>" \
   -var="alb_certificate_arn=<certificate-arn>"
 ```
+
+Or use the `Destroy ECS Infrastructure` workflow in GitHub Actions. It is manual only and requires typing `destroy` into the confirmation box before Terraform runs a destroy plan and applies it.
 
 The OIDC layer is intentionally separate from the main app infrastructure. Keeping it separate means CI/CD access can survive app teardown, which avoids breaking GitHub Actions every time the ECS environment is destroyed.
 
@@ -351,6 +355,19 @@ The latest verified ECS deployment uses:
 ```
 
 The service is active with one desired task and one running task.
+
+### 6. Tear Down the App Infrastructure
+
+The `Destroy ECS Infrastructure` workflow is available for manual cleanup of the app layer. It uses the same GitHub OIDC Terraform role as the deploy workflow, runs `terraform plan -destroy`, then applies the saved plan.
+
+To run it from GitHub Actions:
+
+1. Open the `Destroy ECS Infrastructure` workflow.
+2. Type `destroy` into the confirmation input.
+3. Leave the default placeholder image tag unless you want to pass a specific value.
+4. Start the workflow.
+
+This destroys the Terraform resources in `infra`. It does not destroy the separate OIDC bootstrap layer in `infra/oidc`.
 
 ## Current Gatus Configuration
 

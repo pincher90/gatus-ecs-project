@@ -1,0 +1,64 @@
+name: Destroy ECS Infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_destroy:
+        description: 'Type "destroy" to confirm app infrastructure teardown'
+        required: true
+        type: string
+      image_tag:
+        description: "Placeholder image tag required by Terraform variables"
+        required: true
+        default: "destroy-placeholder"
+        type: string
+
+jobs:
+  destroy:
+    name: Destroy ECS infrastructure
+    runs-on: ubuntu-22.04
+    concurrency:
+      group: terraform-deploy-main
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Check destroy confirmation
+        env:
+          CONFIRM_DESTROY: ${{ github.event.inputs.confirm_destroy }}
+        run: |
+          if [ "$CONFIRM_DESTROY" != "destroy" ]; then
+            echo 'Destroy confirmation did not match "destroy".'
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::965384155823:role/gatus-github-terraform-role
+          role-session-name: gatus-destroy-${{ github.run_id }}
+          aws-region: eu-west-2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v4
+
+      - name: Terraform Init
+        working-directory: infra
+        run: terraform init
+
+      - name: Terraform Destroy Plan
+        working-directory: infra
+        run: |
+          terraform plan -destroy -input=false -out=tfplan \
+            -var-file="envs/dev.tfvars" \
+            -var="image_tag=${{ github.event.inputs.image_tag }}" \
+            -var="alb_certificate_arn=${{ secrets.ALB_CERTIFICATE_ARN }}"
+
+      - name: Terraform Destroy
+        working-directory: infra
+        run: terraform apply -auto-approve -input=false tfplan
