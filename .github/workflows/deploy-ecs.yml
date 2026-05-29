@@ -1,0 +1,46 @@
+name: Deploy ECS
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "ECR image tag to deploy"
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    name: Deploy image to ECS
+    runs-on: ubuntu-22.04
+    concurrency:
+      group: terraform-deploy-main
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::965384155823:role/gatus-github-terraform-role
+          role-session-name: gatus-terraform-${{ github.run_id }}
+          aws-region: eu-west-2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v4
+
+      - name: Terraform Init
+        working-directory: infra
+        run: terraform init
+
+      - name: Terraform Apply
+        working-directory: infra
+        run: |
+          terraform apply -auto-approve -input=false \
+            -var-file="envs/dev.tfvars" \
+            -var="image_tag=${{ github.event.inputs.image_tag }}" \
+            -var="alb_certificate_arn=${{ secrets.ALB_CERTIFICATE_ARN }}"

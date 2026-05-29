@@ -1,0 +1,23 @@
+# Git
+.git
+.gitignore
+
+# Terraform
+infra/
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfvars
+
+# Environment files
+.env
+.env.*
+
+# Mac
+.DS_Store
+
+# Logs
+*.log
+
+# Documentation
+README.md

@@ -1,0 +1,35 @@
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+terraform.tfvars
+*.tfvars
+
+# Allow committed environment tfvars
+!infra/envs/dev.tfvars
+
+# Sensitive files
+*.pem
+*.key
+.env
+.env.*
+
+# Mac
+.DS_Store
+
+# Logs
+*.log
+
+# VSCode
+.vscode/
+
+# Docker
+docker-compose.override.yml
+
+# Local workflow trigger scratch files
+.rebuild*

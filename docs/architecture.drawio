@@ -1,0 +1,104 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Gatus ECS Platform" id="gatus-ecs-platform">
+    <mxGraphModel dx="1500" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="title" value="&lt;b&gt;Gatus ECS Platform&lt;/b&gt;&lt;br&gt;Current Terraform baseline: GitHub OIDC CI/CD, ECR image delivery, public HTTPS ALB, private ECS Fargate tasks, NAT egress, and CloudWatch application logs." style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;fontColor=#0f172a;fontSize=14;align=left;" vertex="1" parent="1">
+          <mxGeometry x="54" y="28" width="980" height="62" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ci-title" value="&lt;b&gt;CI/CD&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;fontColor=#334155;align=left;" vertex="1" parent="1">
+          <mxGeometry x="54" y="114" width="100" height="28" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="developer" value="&lt;b&gt;Developer&lt;/b&gt;&lt;br&gt;push to main" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="54" y="154" width="150" height="86" as="geometry"/>
+        </mxCell>
+        <mxCell id="github-actions" value="&lt;b&gt;GitHub Actions&lt;/b&gt;&lt;br&gt;Terraform CI&lt;br&gt;Docker build + Trivy&lt;br&gt;manual deploy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="260" y="138" width="218" height="118" as="geometry"/>
+        </mxCell>
+        <mxCell id="oidc" value="&lt;b&gt;GitHub OIDC&lt;/b&gt;&lt;br&gt;ECR push role&lt;br&gt;Terraform role&lt;br&gt;main branch trust" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fdf2f8;strokeColor=#ec4899;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="534" y="138" width="210" height="118" as="geometry"/>
+        </mxCell>
+        <mxCell id="ecr" value="&lt;b&gt;Amazon ECR&lt;/b&gt;&lt;br&gt;immutable tags&lt;br&gt;scan on push&lt;br&gt;KMS encrypted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#fb923c;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="800" y="138" width="190" height="118" as="geometry"/>
+        </mxCell>
+        <mxCell id="tf-state" value="&lt;b&gt;Terraform State&lt;/b&gt;&lt;br&gt;S3 backend&lt;br&gt;dev + oidc keys&lt;br&gt;encrypted + lockfile" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fefce8;strokeColor=#eab308;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="1046" y="138" width="214" height="118" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ingress-title" value="&lt;b&gt;Ingress&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;fontColor=#334155;align=left;" vertex="1" parent="1">
+          <mxGeometry x="54" y="312" width="100" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="users" value="&lt;b&gt;Users&lt;/b&gt;&lt;br&gt;browser traffic" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="54" y="354" width="148" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="cloudflare" value="&lt;b&gt;Cloudflare DNS&lt;/b&gt;&lt;br&gt;hostname to ALB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="260" y="354" width="180" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="acm" value="&lt;b&gt;ACM Cert&lt;/b&gt;&lt;br&gt;external prerequisite" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#fb923c;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="498" y="354" width="180" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="aws" value="&lt;b&gt;AWS eu-west-2&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#94a3b8;fontColor=#334155;verticalAlign=top;align=left;spacingLeft=24;spacingTop=18;" vertex="1" parent="1">
+          <mxGeometry x="54" y="492" width="1390" height="326" as="geometry"/>
+        </mxCell>
+        <mxCell id="vpc" value="&lt;b&gt;VPC 10.0.0.0/16&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#faf5ff;strokeColor=#8b5cf6;fontColor=#334155;verticalAlign=top;align=left;spacingLeft=24;spacingTop=18;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="98" y="548" width="874" height="226" as="geometry"/>
+        </mxCell>
+        <mxCell id="public-subnets" value="&lt;b&gt;Public subnets&lt;/b&gt;&lt;br&gt;10.0.1.0/24, 10.0.2.0/24" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#86efac;fontColor=#0f172a;verticalAlign=top;align=left;spacingLeft=22;spacingTop=16;" vertex="1" parent="1">
+          <mxGeometry x="132" y="612" width="376" height="128" as="geometry"/>
+        </mxCell>
+        <mxCell id="private-subnets" value="&lt;b&gt;Private subnets&lt;/b&gt;&lt;br&gt;10.0.11.0/24, 10.0.12.0/24" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ecfeff;strokeColor=#67e8f9;fontColor=#0f172a;verticalAlign=top;align=left;spacingLeft=22;spacingTop=16;" vertex="1" parent="1">
+          <mxGeometry x="562" y="612" width="376" height="128" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="alb" value="&lt;b&gt;Application Load Balancer&lt;/b&gt;&lt;br&gt;80 redirects to 443, forwards to 8080" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#fb923c;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="154" y="598" width="284" height="58" as="geometry"/>
+        </mxCell>
+        <mxCell id="igw" value="IGW" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#22c55e;fontColor=#334155;" vertex="1" parent="1">
+          <mxGeometry x="154" y="690" width="126" height="38" as="geometry"/>
+        </mxCell>
+        <mxCell id="nat" value="NAT + EIP" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#22c55e;fontColor=#334155;" vertex="1" parent="1">
+          <mxGeometry x="312" y="690" width="126" height="38" as="geometry"/>
+        </mxCell>
+        <mxCell id="ecs" value="&lt;b&gt;ECS Fargate Service: Gatus task&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#60a5fa;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="592" y="684" width="316" height="46" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="security-groups" value="&lt;b&gt;Security Groups&lt;/b&gt;&lt;br&gt;ALB to ECS only" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fdf2f8;strokeColor=#ec4899;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="1006" y="548" width="190" height="88" as="geometry"/>
+        </mxCell>
+        <mxCell id="task-role" value="&lt;b&gt;Task Execution Role&lt;/b&gt;&lt;br&gt;pull image + write logs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fdf2f8;strokeColor=#ec4899;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="1006" y="686" width="190" height="88" as="geometry"/>
+        </mxCell>
+        <mxCell id="cloudwatch" value="&lt;b&gt;CloudWatch&lt;/b&gt;&lt;br&gt;/ecs/gatus logs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#60a5fa;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="1240" y="548" width="164" height="88" as="geometry"/>
+        </mxCell>
+        <mxCell id="insights" value="&lt;b&gt;Container&lt;/b&gt;&lt;br&gt;Insights enabled" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#60a5fa;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="1240" y="686" width="164" height="88" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="note" value="Baseline intentionally keeps ECS private, exposes only the ALB, uses GitHub OIDC instead of static AWS keys, and stores Terraform state in S3." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;fontColor=#64748b;align=left;spacingLeft=24;" vertex="1" parent="1">
+          <mxGeometry x="54" y="842" width="1390" height="36" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e1" style="endArrow=block;html=1;rounded=0;strokeColor=#334155;strokeWidth=2;" edge="1" parent="1" source="developer" target="github-actions"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e2" style="endArrow=block;html=1;rounded=0;strokeColor=#16a34a;strokeWidth=2;" edge="1" parent="1" source="github-actions" target="oidc"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e3" style="endArrow=block;html=1;rounded=0;strokeColor=#2563eb;strokeWidth=2;" edge="1" parent="1" source="oidc" target="ecr"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e4" style="endArrow=block;html=1;rounded=0;strokeColor=#16a34a;strokeWidth=2;dashed=1;" edge="1" parent="1" source="oidc" target="tf-state"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e5" style="endArrow=block;html=1;rounded=0;strokeColor=#334155;strokeWidth=2;" edge="1" parent="1" source="users" target="cloudflare"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e6" style="endArrow=block;html=1;rounded=0;strokeColor=#334155;strokeWidth=2;dashed=1;" edge="1" parent="1" source="cloudflare" target="acm"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e7" style="endArrow=block;html=1;rounded=0;strokeColor=#334155;strokeWidth=2;" edge="1" parent="1" source="cloudflare" target="alb"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e8" style="endArrow=block;html=1;rounded=0;strokeColor=#334155;strokeWidth=2;" edge="1" parent="1" source="alb" target="ecs"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e9" style="endArrow=block;html=1;rounded=0;strokeColor=#2563eb;strokeWidth=2;" edge="1" parent="1" source="ecr" target="ecs"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e10" style="endArrow=block;html=1;rounded=0;strokeColor=#2563eb;strokeWidth=2;" edge="1" parent="1" source="ecs" target="cloudwatch"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e11" style="endArrow=block;html=1;rounded=0;strokeColor=#16a34a;strokeWidth=2;dashed=1;" edge="1" parent="1" source="task-role" target="ecs"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e12" style="endArrow=block;html=1;rounded=0;strokeColor=#16a34a;strokeWidth=2;dashed=1;" edge="1" parent="1" source="ecs" target="nat"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e13" style="endArrow=block;html=1;rounded=0;strokeColor=#16a34a;strokeWidth=2;dashed=1;" edge="1" parent="1" source="nat" target="igw"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,20 @@
+FROM golang:1.26.3-alpine AS builder
+
+RUN apk add --no-cache ca-certificates
+
+RUN CGO_ENABLED=0 GOOS=linux go install -ldflags="-s -w" github.com/TwiN/gatus/v5@v5.36.0
+
+FROM scratch
+
+COPY --from=builder /go/bin/gatus /go/bin/gatus
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+
+COPY app/config/config.yaml /app/config/config.yaml
+
+USER 1000
+
+ENV GATUS_CONFIG_PATH=/app/config/config.yaml
+
+EXPOSE 8080
+
+ENTRYPOINT ["/go/bin/gatus"]

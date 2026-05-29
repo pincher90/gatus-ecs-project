@@ -1,0 +1,7 @@
+endpoints:
+  - name: Gatus Self Check
+    group: Local
+    url: "http://localhost:8080"
+    interval: 30s
+    conditions:
+      - "[STATUS] == 200"

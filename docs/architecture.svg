@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="900" viewBox="0 0 1500 900" role="img" aria-labelledby="title desc">
+  <title id="title">Gatus ECS Platform Architecture</title>
+  <desc id="desc">Architecture diagram for the Gatus ECS platform showing GitHub Actions, OIDC IAM roles, ECR, Terraform state in S3, Cloudflare DNS, ACM, ALB in public subnets, NAT Gateway, ECS Fargate in private subnets, and CloudWatch Logs.</desc>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <marker id="blueArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+    </marker>
+    <marker id="greenArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#16a34a"/>
+    </marker>
+  </defs>
+
+  <style>
+    .bg { fill: #f8fafc; }
+    .title { font: 700 28px Arial, Helvetica, sans-serif; fill: #0f172a; }
+    .subtitle { font: 14px Arial, Helvetica, sans-serif; fill: #475569; }
+    .laneTitle { font: 700 15px Arial, Helvetica, sans-serif; fill: #334155; }
+    .label { font: 700 15px Arial, Helvetica, sans-serif; fill: #0f172a; }
+    .small { font: 13px Arial, Helvetica, sans-serif; fill: #334155; }
+    .tiny { font: 12px Arial, Helvetica, sans-serif; fill: #64748b; }
+    .awsBoundary { fill: #ffffff; stroke: #94a3b8; stroke-width: 1.4; rx: 10; }
+    .vpcBoundary { fill: #faf5ff; stroke: #8b5cf6; stroke-width: 2; rx: 10; }
+    .subnetPublic { fill: #f0fdf4; stroke: #86efac; stroke-width: 1.2; rx: 8; }
+    .subnetPrivate { fill: #ecfeff; stroke: #67e8f9; stroke-width: 1.2; rx: 8; }
+    .card { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.2; rx: 8; }
+    .orange { fill: #fff7ed; stroke: #fb923c; stroke-width: 1.2; rx: 8; }
+    .pink { fill: #fdf2f8; stroke: #ec4899; stroke-width: 1.2; rx: 8; }
+    .blue { fill: #eff6ff; stroke: #60a5fa; stroke-width: 1.2; rx: 8; }
+    .green { fill: #f0fdf4; stroke: #22c55e; stroke-width: 1.2; rx: 8; }
+    .yellow { fill: #fefce8; stroke: #eab308; stroke-width: 1.2; rx: 8; }
+    .flow { fill: none; stroke: #334155; stroke-width: 1.6; marker-end: url(#arrow); }
+    .flowBlue { fill: none; stroke: #2563eb; stroke-width: 1.6; marker-end: url(#blueArrow); }
+    .flowGreen { fill: none; stroke: #16a34a; stroke-width: 1.6; marker-end: url(#greenArrow); }
+    .dash { stroke-dasharray: 6 5; }
+  </style>
+
+  <rect class="bg" width="1500" height="900"/>
+  <text x="54" y="54" class="title">Gatus ECS Platform</text>
+  <text x="54" y="82" class="subtitle">Current Terraform baseline: GitHub OIDC CI/CD, ECR image delivery, public HTTPS ALB, private ECS Fargate tasks, NAT egress, and CloudWatch application logs.</text>
+
+  <!-- CI/CD lane -->
+  <text x="54" y="132" class="laneTitle">CI/CD</text>
+  <rect x="54" y="154" width="150" height="86" class="card"/>
+  <text x="129" y="188" text-anchor="middle" class="label">Developer</text>
+  <text x="129" y="212" text-anchor="middle" class="small">push to main</text>
+
+  <rect x="260" y="138" width="218" height="118" class="card"/>
+  <text x="369" y="172" text-anchor="middle" class="label">GitHub Actions</text>
+  <text x="369" y="196" text-anchor="middle" class="small">Terraform CI</text>
+  <text x="369" y="216" text-anchor="middle" class="small">Docker build + Trivy</text>
+  <text x="369" y="236" text-anchor="middle" class="small">manual deploy</text>
+
+  <rect x="534" y="138" width="210" height="118" class="pink"/>
+  <text x="639" y="172" text-anchor="middle" class="label">GitHub OIDC</text>
+  <text x="639" y="196" text-anchor="middle" class="small">ECR push role</text>
+  <text x="639" y="216" text-anchor="middle" class="small">Terraform role</text>
+  <text x="639" y="236" text-anchor="middle" class="small">main branch trust</text>
+
+  <rect x="800" y="138" width="190" height="118" class="orange"/>
+  <text x="895" y="172" text-anchor="middle" class="label">Amazon ECR</text>
+  <text x="895" y="196" text-anchor="middle" class="small">immutable tags</text>
+  <text x="895" y="216" text-anchor="middle" class="small">scan on push</text>
+  <text x="895" y="236" text-anchor="middle" class="small">KMS encrypted</text>
+
+  <rect x="1046" y="138" width="214" height="118" class="yellow"/>
+  <text x="1153" y="172" text-anchor="middle" class="label">Terraform State</text>
+  <text x="1153" y="196" text-anchor="middle" class="small">S3 backend</text>
+  <text x="1153" y="216" text-anchor="middle" class="small">dev + oidc keys</text>
+  <text x="1153" y="236" text-anchor="middle" class="small">encrypted + lockfile</text>
+
+  <path d="M204 197 L260 197" class="flow"/>
+  <path d="M478 197 L534 197" class="flowGreen"/>
+  <path d="M744 197 L800 197" class="flowBlue"/>
+  <path d="M744 226 L1046 226" class="flowGreen dash"/>
+
+  <!-- External ingress -->
+  <text x="54" y="332" class="laneTitle">Ingress</text>
+  <rect x="54" y="354" width="148" height="80" class="card"/>
+  <text x="128" y="388" text-anchor="middle" class="label">Users</text>
+  <text x="128" y="412" text-anchor="middle" class="small">browser traffic</text>
+
+  <rect x="260" y="354" width="180" height="80" class="card"/>
+  <text x="350" y="388" text-anchor="middle" class="label">Cloudflare DNS</text>
+  <text x="350" y="412" text-anchor="middle" class="small">hostname to ALB</text>
+
+  <rect x="498" y="354" width="180" height="80" class="orange"/>
+  <text x="588" y="388" text-anchor="middle" class="label">ACM Cert</text>
+  <text x="588" y="412" text-anchor="middle" class="small">external prerequisite</text>
+
+  <path d="M202 394 L260 394" class="flow"/>
+  <path d="M440 394 L498 394" class="flow dash"/>
+
+  <!-- AWS boundary -->
+  <rect x="54" y="492" width="1390" height="326" class="awsBoundary"/>
+  <text x="78" y="524" class="laneTitle">AWS eu-west-2</text>
+
+  <rect x="98" y="548" width="874" height="226" class="vpcBoundary"/>
+  <text x="124" y="580" class="laneTitle">VPC 10.0.0.0/16</text>
+
+  <rect x="132" y="612" width="376" height="128" class="subnetPublic"/>
+  <text x="154" y="642" class="label">Public subnets</text>
+  <text x="154" y="666" class="small">10.0.1.0/24, 10.0.2.0/24</text>
+
+  <rect x="562" y="612" width="376" height="128" class="subnetPrivate"/>
+  <text x="584" y="642" class="label">Private subnets</text>
+  <text x="584" y="666" class="small">10.0.11.0/24, 10.0.12.0/24</text>
+
+  <rect x="154" y="690" width="126" height="38" class="green"/>
+  <text x="217" y="714" text-anchor="middle" class="small">IGW</text>
+
+  <rect x="312" y="690" width="126" height="38" class="green"/>
+  <text x="375" y="714" text-anchor="middle" class="small">NAT + EIP</text>
+
+  <rect x="154" y="598" width="284" height="58" class="orange"/>
+  <text x="296" y="622" text-anchor="middle" class="label">Application Load Balancer</text>
+  <text x="296" y="644" text-anchor="middle" class="small">80 redirects to 443, forwards to 8080</text>
+
+  <rect x="592" y="684" width="316" height="46" class="blue"/>
+  <text x="750" y="712" text-anchor="middle" class="label">ECS Fargate Service: Gatus task</text>
+
+  <rect x="1006" y="548" width="190" height="88" class="pink"/>
+  <text x="1101" y="584" text-anchor="middle" class="label">Security Groups</text>
+  <text x="1101" y="608" text-anchor="middle" class="small">ALB to ECS only</text>
+
+  <rect x="1006" y="686" width="190" height="88" class="pink"/>
+  <text x="1101" y="722" text-anchor="middle" class="label">Task Execution Role</text>
+  <text x="1101" y="746" text-anchor="middle" class="small">pull image + write logs</text>
+
+  <rect x="1240" y="548" width="164" height="88" class="blue"/>
+  <text x="1322" y="584" text-anchor="middle" class="label">CloudWatch</text>
+  <text x="1322" y="608" text-anchor="middle" class="small">/ecs/gatus logs</text>
+
+  <rect x="1240" y="686" width="164" height="88" class="blue"/>
+  <text x="1322" y="722" text-anchor="middle" class="label">Container</text>
+  <text x="1322" y="746" text-anchor="middle" class="small">Insights enabled</text>
+
+  <path d="M350 434 L296 598" class="flow"/>
+  <path d="M588 434 L438 598" class="flow dash"/>
+  <path d="M296 656 L750 684" class="flow"/>
+  <path d="M895 256 L750 684" class="flowBlue"/>
+  <path d="M750 730 L1322 548" class="flowBlue"/>
+  <path d="M1101 686 L750 684" class="flowGreen dash"/>
+  <path d="M750 684 L375 728" class="flowGreen dash"/>
+  <path d="M375 690 L217 690" class="flowGreen dash"/>
+
+  <!-- Notes -->
+  <rect x="54" y="842" width="1390" height="36" class="card"/>
+  <text x="78" y="865" class="tiny">Baseline intentionally keeps ECS private, exposes only the ALB, uses GitHub OIDC instead of static AWS keys, and stores Terraform state in S3.</text>
+</svg>
