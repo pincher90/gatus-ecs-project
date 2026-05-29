@@ -5,3 +5,24 @@ endpoints:
     interval: 30s
     conditions:
       - "[STATUS] == 200"
+
+  - name: Facebook
+    group: Social
+    url: "https://www.facebook.com"
+    interval: 1m
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: X
+    group: Social
+    url: "https://x.com"
+    interval: 1m
+    conditions:
+      - "[STATUS] == 200"
+
+  - name: Instagram
+    group: Social
+    url: "https://www.instagram.com"
+    interval: 1m
+    conditions:
+      - "[STATUS] == 200"
