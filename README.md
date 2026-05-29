@@ -93,6 +93,7 @@ The latest verified deployment is running image tag `291c1b4` from ECR on ECS ta
 |   `-- screenshots/
 |       |-- deploy-ecs-success.png
 |       |-- docker-build-push-success.png
+|       |-- gatus-live-site.png
 |       `-- terraform-ci-success.png
 |-- infra/
 |   |-- envs/
@@ -438,6 +439,13 @@ The deployed AWS resources have also been checked from the AWS side:
 - ALB listener `HTTP:80` redirects to `HTTPS:443`.
 - ALB listener `HTTPS:443` forwards traffic to target group `gatus-tg`.
 - Target group `gatus-tg` has a healthy IP target on port `8080`.
+- The live HTTPS endpoint `https://gatus.appjojocloud.com` returns `200`.
+
+### Live Gatus Dashboard
+
+The deployed Gatus dashboard is reachable over HTTPS through Cloudflare DNS and the public ALB. The live dashboard shows the local self-check plus Facebook, X, and Instagram endpoint checks as healthy.
+
+![Live Gatus dashboard over HTTPS](docs/screenshots/gatus-live-site.png)
 
 ---
 
