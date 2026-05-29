@@ -375,6 +375,12 @@ The Terraform CI workflow has passed with formatting, validation, TFLint, and Ch
 
 ![Terraform CI workflow passing](docs/screenshots/terraform-ci-success.png)
 
+### Docker Build and Push
+
+The Docker image workflow has passed with AWS OIDC authentication, ECR login, image build, Trivy scan, and ECR push completed successfully.
+
+![Docker build and push workflow passing](docs/screenshots/docker-build-push-success.png)
+
 ---
 
 ## Troubleshooting and Operations
