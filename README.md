@@ -104,6 +104,7 @@ The ALB redirects HTTP traffic to HTTPS and uses the ACM certificate issued for 
 |       |-- deploy-ecs-success.png
 |       |-- docker-build-push-success.png
 |       |-- gatus-live-site.png
+|       |-- target-group-healthy.png
 |       `-- terraform-ci-success.png
 |-- infra/
 |   |-- envs/
@@ -436,8 +437,10 @@ The deployed AWS resources have also been checked from the AWS side:
 - ECS service `gatus-service` is active with `1` desired task and `1` running task.
 - ALB listener `HTTP:80` redirects to `HTTPS:443`.
 - ALB listener `HTTPS:443` forwards traffic to target group `gatus-tg`.
-- Target group `gatus-tg` has a healthy IP target on port `8080`.
+- Target group `gatus-tg` has one healthy ECS task target on port `8080`.
 - The live HTTPS endpoint `https://gatus.appjojocloud.com` returns `200`.
+
+![ALB target group healthy](docs/screenshots/target-group-healthy.png)
 
 ### Live Gatus Dashboard
 
