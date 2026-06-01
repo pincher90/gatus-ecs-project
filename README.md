@@ -6,6 +6,22 @@ It follows the full deployment path from code to a working HTTPS service: Terraf
 
 The first version is focused on the core pieces needed for a real ECS deployment: private ECS tasks, a public ALB, TLS, ECR, CloudWatch logs, remote Terraform state, and GitHub Actions OIDC instead of long lived AWS keys.
 
+## Table of Contents
+
+1. [What It Builds](#what-it-builds)
+2. [Live URL](#live-url)
+3. [What I Built](#what-i-built)
+4. [Repository Structure](#repository-structure)
+5. [Tech Stack](#tech-stack)
+6. [Local Setup for Developers](#local-setup-for-developers)
+7. [Deployment Flow](#deployment-flow)
+8. [Current Gatus Configuration](#current-gatus-configuration)
+9. [Validation and Security Checks](#validation-and-security-checks)
+10. [Pipeline Evidence](#pipeline-evidence)
+11. [Troubleshooting and Operations](#troubleshooting-and-operations)
+12. [Future Plans](#future-plans)
+13. [Why This Project](#why-this-project)
+
 ## What It Builds
 
 ![Gatus ECS Platform Architecture](docs/architecture.svg)
