@@ -1,10 +1,10 @@
 # Gatus on ECS with Terraform
 
-This repo is my AWS ECS project for running [Gatus](https://github.com/TwiN/gatus) on Fargate.
+This project runs [Gatus](https://github.com/TwiN/gatus) on AWS ECS Fargate with Terraform and GitHub Actions.
 
-Terraform builds the AWS infrastructure, GitHub Actions builds and deploys the container image, and Cloudflare DNS points the public hostname at the load balancer.
+It follows the full deployment path from code to a working HTTPS service: Terraform provisions the AWS resources, GitHub Actions builds and pushes the container image, and Cloudflare DNS points `gatus.appjojocloud.com` at the public load balancer.
 
-I kept the first working version deliberately small so the full path is easy to follow: private ECS tasks, a public ALB, TLS, ECR image delivery, application logs, and CI/CD using OIDC instead of long lived AWS keys.
+The first version is focused on the core pieces needed for a real ECS deployment: private ECS tasks, a public ALB, TLS, ECR, CloudWatch logs, remote Terraform state, and GitHub Actions OIDC instead of long lived AWS keys.
 
 ## What It Builds
 
