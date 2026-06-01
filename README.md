@@ -490,7 +490,6 @@ Issues worked through during the build include:
 ## Future Plans
 
 - Adding more meaningful internal and external Gatus checks.
-- Adding final AWS console evidence for ECR, ECS service health, ALB listeners, target health, and the live app.
 - Adding ECS autoscaling policies.
 - Considering VPC endpoints to reduce NAT dependency.
 - Adding optional public access protection and deeper network logging as a later hardening phase.
@@ -499,4 +498,4 @@ Issues worked through during the build include:
 
 ## Why This Project
 
-I built this to practise the full path from Terraform to a real running container service. It covers the parts I wanted to work through properly: private networking, ECS Fargate, IAM, ECR, ALB routing, TLS, GitHub Actions OIDC, image scanning, Terraform checks, and the day to day troubleshooting that comes with wiring all of it together.
+This project shows an end to end ECS deployment built with Terraform and GitHub Actions. It covers the infrastructure and release workflow a small production service needs: private networking, ECS Fargate, IAM, ECR, ALB routing, TLS, GitHub Actions OIDC, image scanning, Terraform checks, and the day to day troubleshooting that comes with wiring everything together.
