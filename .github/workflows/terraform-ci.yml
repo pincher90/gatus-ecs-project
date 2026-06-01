@@ -63,4 +63,4 @@ jobs:
         with:
           directory: infra
           quiet: true
-          skip_check: CKV2_AWS_11,CKV2_AWS_28,CKV2_AWS_76,CKV_AWS_91,CKV_AWS_158
+          skip_check: CKV2_AWS_11,CKV2_AWS_28,CKV_AWS_91,CKV_AWS_158
