@@ -10,7 +10,7 @@ I kept the first working version deliberately small so the full path is easy to 
 
 ![Gatus ECS Platform Architecture](docs/architecture.svg)
 
-Editable diagrams.net source: [docs/architecture.drawio](docs/architecture.drawio).
+Architecture diagram exported from Lucidchart.
 
 The project creates:
 
