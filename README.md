@@ -101,7 +101,6 @@ After the destroy workflow has run, the hostname remains configured in Cloudflar
 |   `-- config/
 |       `-- config.yaml
 |-- docs/
-|   |-- architecture.drawio
 |   |-- architecture.svg
 |   `-- screenshots/
 |       |-- deploy-ecs-success.png
