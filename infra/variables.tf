@@ -33,11 +33,6 @@ variable "image_tag" {
   type        = string
 }
 
-variable "alb_certificate_arn" {
-  description = "ACM certificate ARN for the public ALB HTTPS listener"
-  type        = string
-}
-
 variable "domain_name" {
   description = "Public hostname for the gatus service"
   type        = string
@@ -46,5 +41,4 @@ variable "domain_name" {
 variable "hosted_zone_name" {
   description = "Route 53 hosted zone name for the delegated subdomain"
   type        = string
-
 }

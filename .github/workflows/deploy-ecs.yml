@@ -42,5 +42,4 @@ jobs:
         run: |
           terraform apply -auto-approve -input=false \
             -var-file="envs/dev.tfvars" \
-            -var="image_tag=${{ github.event.inputs.image_tag }}" \
-            -var="alb_certificate_arn=${{ secrets.ALB_CERTIFICATE_ARN }}"
+            -var="image_tag=${{ github.event.inputs.image_tag }}"

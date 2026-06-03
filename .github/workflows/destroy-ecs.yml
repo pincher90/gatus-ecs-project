@@ -56,8 +56,7 @@ jobs:
         run: |
           terraform plan -destroy -input=false -out=tfplan \
             -var-file="envs/dev.tfvars" \
-            -var="image_tag=${{ github.event.inputs.image_tag }}" \
-            -var="alb_certificate_arn=${{ secrets.ALB_CERTIFICATE_ARN }}"
+            -var="image_tag=${{ github.event.inputs.image_tag }}"
 
       - name: Terraform Destroy
         working-directory: infra
