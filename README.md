@@ -37,11 +37,13 @@ The project creates:
 - ECS Fargate cluster and service running Gatus.
 - Public Application Load Balancer with HTTP to HTTPS redirect.
 - HTTPS listener backed by ACM.
+- Terraform-managed ACM validation records in Route 53.
+- Route 53 alias record pointing the public hostname at the ALB.
 - ECR repository for immutable Gatus images.
 - CloudWatch logging for ECS application logs.
 - GitHub Actions OIDC roles for ECR pushes and Terraform deploys.
 
-The project has been deployed successfully with image tag `291c1b4` from ECR on ECS task definition `gatus-task:20`. That deployment was later removed with the manual destroy workflow, which is included as evidence in this README.
+The latest Route 53 based deployment was verified successfully with image tag `4d170ab`. The app layer was then removed with Terraform destroy so the teardown path could be tested as well.
 
 ## Live URL
 
@@ -55,16 +57,17 @@ Cloudflare manages DNS for `appjojocloud.com`. The `gatus` subdomain is delegate
 
 The ALB redirects HTTP traffic to HTTPS and uses an ACM certificate issued for `gatus.appjojocloud.com`.
 
-After the destroy workflow has run, the hostname remains configured in Cloudflare but the app will not be available until Terraform recreates the app layer.
+After the destroy workflow has run, the Cloudflare delegation and Route 53 hosted zone remain in place. Terraform recreates the ACM certificate records and ALB alias record when the app layer is deployed again.
 
 ## What I Built
 
 ### AWS Infrastructure with Terraform
 
-- Modular Terraform layout for VPC, security groups, ALB, ECS, and ECR.
+- Modular Terraform layout for VPC, security groups, ALB, ECS, ECR, ACM certificate validation, and Route 53 DNS.
 - Remote Terraform state stored in S3.
-- Environment specific values in `infra/envs/dev.tfvars`.
+- Environment specific values in `infra/envs/dev.tfvars`, including ECS CPU, memory, and desired task count.
 - Public and private route tables with subnet associations.
+- Common AWS tags applied through the Terraform AWS provider.
 - Minimal baseline security focused on private ECS tasks, security groups, TLS, and short lived CI/CD credentials.
 
 ### Container Platform on ECS
@@ -126,12 +129,17 @@ After the destroy workflow has run, the hostname remains configured in Cloudflar
 |   |   `-- dev.tfvars
 |   |-- modules/
 |   |   |-- alb/
+|   |   |-- certificate/
+|   |   |-- dns/
 |   |   |-- ecr/
 |   |   |-- ecs/
 |   |   |-- security/
 |   |   `-- vpc/
 |   |-- oidc/
 |   |-- backend.tf
+|   |-- certificate.tf
+|   |-- dns.tf
+|   |-- locals.tf
 |   |-- main.tf
 |   |-- outputs.tf
 |   |-- provider.tf
@@ -227,7 +235,7 @@ To deploy your own copy of the full platform, update the repository specific val
 - `infra/oidc/variables.tf`: update `github_owner`, `github_repo`, and `github_subjects`.
 - `.github/workflows/docker-build-push.yml`: update the AWS account ID, ECR repository URI, and ECR role ARN.
 - `.github/workflows/deploy-ecs.yml`: update the AWS account ID and Terraform deploy role ARN.
-- `infra/envs/dev.tfvars`: adjust the AWS region, project name, CIDR ranges, and Availability Zones if needed.
+- `infra/envs/dev.tfvars`: adjust the AWS region, project name, environment name, CIDR ranges, Availability Zones, ECS sizing, and public hostname values if needed.
 
 The bootstrap order is:
 
@@ -296,9 +304,9 @@ repo:pincher90/gatus-ecs-project:ref:refs/heads/main
 
 Cloudflare manages the parent domain, `appjojocloud.com`. The `gatus` subdomain is delegated to Route 53 with `NS` records in Cloudflare.
 
-The Route 53 hosted zone for `gatus.appjojocloud.com` is kept outside the main app destroy flow so the delegated nameservers stay stable. Terraform looks up that hosted zone, creates the ACM certificate, writes the DNS validation record, waits for the certificate to be issued, and creates the alias record to the ALB.
+The Route 53 hosted zone for `gatus.appjojocloud.com` is kept outside the main app destroy flow so the delegated nameservers stay stable. Terraform looks up that hosted zone through the certificate and DNS modules, creates the ACM certificate, writes the DNS validation record, waits for the certificate to be issued, and creates the alias record to the ALB.
 
-The one manual DNS prerequisite is adding the Route 53 nameservers to Cloudflare for the `gatus` subdomain.
+The one manual DNS prerequisite is adding the Route 53 nameservers to Cloudflare for the `gatus` subdomain. After that delegation exists, Terraform manages the application DNS records and certificate validation records.
 
 ### 3. Bootstrap ECR
 
@@ -325,7 +333,7 @@ It will:
 - Scan the image with Trivy.
 - Push the image to ECR.
 
-The current ECR repository contains successful image tags `cc4e35d` and `291c1b4`. The latest image, `291c1b4`, was built after adding the public social endpoint checks.
+Evidence from the build pipeline shows successful image tags including `cc4e35d`, `291c1b4`, and `4d170ab`. The app infrastructure can be destroyed and recreated, so the ECR repository may not exist until the bootstrap ECR step or full app deployment is run again.
 
 ### 5. Deploy to ECS
 
@@ -352,7 +360,7 @@ Terraform creates the Route 53 alias record that points the delegated hostname a
 The latest verified ECS deployment used:
 
 ```text
-965384155823.dkr.ecr.eu-west-2.amazonaws.com/gatus-repo:291c1b4
+965384155823.dkr.ecr.eu-west-2.amazonaws.com/gatus-repo:4d170ab
 ```
 
 The service was active with one desired task and one running task before the destroy workflow was run.
@@ -457,7 +465,7 @@ The destroy workflow has passed after a manual confirmation. It ran Terraform de
 
 Before teardown, the deployed AWS resources were also checked from the AWS side:
 
-- ECR contains image tag `291c1b4`.
+- ECR contained the image tag used for the verified deployment.
 - ECS service `gatus-service` was active with `1` desired task and `1` running task.
 - ALB listener `HTTP:80` redirects to `HTTPS:443`.
 - ALB listener `HTTPS:443` forwards traffic to target group `gatus-tg`.
