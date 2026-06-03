@@ -33,6 +33,21 @@ variable "image_tag" {
   type        = string
 }
 
+variable "ecs_cpu" {
+  description = "CPU units for the ECS Fargate task"
+  type        = number
+}
+
+variable "ecs_memory" {
+  description = "Memory in MiB for the ECS Fargate task"
+  type        = number
+}
+
+variable "ecs_desired_count" {
+  description = "Number of ECS tasks to run"
+  type        = number
+}
+
 variable "domain_name" {
   description = "Public hostname for the gatus service"
   type        = string

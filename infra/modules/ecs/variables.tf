@@ -29,6 +29,21 @@ variable "container_port" {
   default     = 8080
 }
 
+variable "task_cpu" {
+  description = "CPU units for the ECS Fargate task"
+  type        = number
+}
+
+variable "task_memory" {
+  description = "Memory in MiB for the ECS Fargate task"
+  type        = number
+}
+
+variable "desired_count" {
+  description = "Number of ECS tasks to run"
+  type        = number
+}
+
 variable "aws_region" {
   type = string
 }

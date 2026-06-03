@@ -36,6 +36,9 @@ module "ecs" {
   target_group_arn      = module.alb.target_group_arn
   container_image       = "${module.ecr.repository_url}:${var.image_tag}"
   container_port        = 8080
+  task_cpu              = var.ecs_cpu
+  task_memory           = var.ecs_memory
+  desired_count         = var.ecs_desired_count
 }
 
 module "ecr" {

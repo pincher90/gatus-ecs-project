@@ -19,5 +19,9 @@ availability_zones = [
   "eu-west-2b"
 ]
 
+ecs_cpu           = 256
+ecs_memory        = 512
+ecs_desired_count = 1
+
 domain_name      = "gatus.appjojocloud.com"
 hosted_zone_name = "gatus.appjojocloud.com."
