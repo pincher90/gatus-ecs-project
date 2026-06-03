@@ -18,3 +18,6 @@ availability_zones = [
   "eu-west-2a",
   "eu-west-2b"
 ]
+
+domain_name      = "gatus.appjojocloud.com"
+hosted_zone_name = "gatus.appjojocloud.com."
