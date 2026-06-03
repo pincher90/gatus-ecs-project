@@ -135,7 +135,7 @@ After the destroy workflow has run, the Cloudflare delegation and Route 53 hoste
 |   |   |-- ecs/
 |   |   |-- security/
 |   |   `-- vpc/
-|   |-- oidc/
+|   |-- bootstrap/
 |   |-- backend.tf
 |   |-- certificate.tf
 |   |-- dns.tf
@@ -221,8 +221,8 @@ You can validate the Terraform without connecting to the remote S3 backend:
 terraform -chdir=infra init -backend=false
 terraform -chdir=infra validate
 
-terraform -chdir=infra/oidc init -backend=false
-terraform -chdir=infra/oidc validate
+terraform -chdir=infra/bootstrap init -backend=false
+terraform -chdir=infra/bootstrap validate
 ```
 
 This is useful for checking syntax and module wiring before running a real deployment.
@@ -231,8 +231,8 @@ This is useful for checking syntax and module wiring before running a real deplo
 
 To deploy your own copy of the full platform, update the repository specific values first:
 
-- `infra/backend.tf` and `infra/oidc/backend.tf`: use your own S3 state bucket and state keys.
-- `infra/oidc/variables.tf`: update `github_owner`, `github_repo`, and `github_subjects`.
+- `infra/backend.tf` and `infra/bootstrap/backend.tf`: use your own S3 state bucket and state keys.
+- `infra/bootstrap/variables.tf`: update `github_owner`, `github_repo`, and `github_subjects`.
 - `.github/workflows/docker-build-push.yml`: update the AWS account ID, ECR repository URI, and ECR role ARN.
 - `.github/workflows/deploy-ecs.yml`: update the AWS account ID and Terraform deploy role ARN.
 - `infra/envs/dev.tfvars`: adjust the AWS region, project name, environment name, CIDR ranges, Availability Zones, ECS sizing, and public hostname values if needed.
@@ -244,7 +244,7 @@ The bootstrap order is:
 3. Apply the OIDC layer:
 
 ```bash
-cd infra/oidc
+cd infra/bootstrap
 terraform init
 terraform apply
 ```
@@ -289,7 +289,7 @@ The OIDC bootstrap layer creates the IAM roles used by GitHub Actions:
 Apply this layer once with existing AWS credentials:
 
 ```bash
-cd infra/oidc
+cd infra/bootstrap
 terraform init
 terraform apply
 ```
@@ -376,7 +376,7 @@ To run it from GitHub Actions:
 3. Leave the default placeholder image tag unless you want to pass a specific value.
 4. Start the workflow.
 
-This destroys the Terraform resources in `infra`. It does not destroy the separate OIDC bootstrap layer in `infra/oidc`.
+This destroys the Terraform resources in `infra`. It does not destroy the separate bootstrap layer in `infra/bootstrap`.
 
 ## Current Gatus Configuration
 

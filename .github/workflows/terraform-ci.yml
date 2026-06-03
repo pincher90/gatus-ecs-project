@@ -43,12 +43,12 @@ jobs:
         working-directory: infra
         run: terraform validate
 
-      - name: Terraform Init OIDC
-        working-directory: infra/oidc
+      - name: Terraform Init Bootstrap
+        working-directory: infra/bootstrap
         run: terraform init -backend=false
 
-      - name: Terraform Validate OIDC
-        working-directory: infra/oidc
+      - name: Terraform Validate Bootstrap
+        working-directory: infra/bootstrap
         run: terraform validate
 
       - name: Set up TFLint
