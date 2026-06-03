@@ -182,12 +182,15 @@ data "aws_iam_policy_document" "github_terraform" {
   }
 
   statement {
-    sid    = "ReadAcmCertificate"
+    sid    = "ManageProjectCertificates"
     effect = "Allow"
     actions = [
+      "acm:AddTagsToCertificate",
+      "acm:DeleteCertificate",
       "acm:DescribeCertificate",
       "acm:ListCertificates",
-      "acm:ListTagsForCertificate"
+      "acm:ListTagsForCertificate",
+      "acm:RequestCertificate"
     ]
     resources = ["*"]
   }
