@@ -196,6 +196,19 @@ data "aws_iam_policy_document" "github_terraform" {
   }
 
   statement {
+    sid    = "ManageProjectDnsRecords"
+    effect = "Allow"
+    actions = [
+      "route53:ChangeResourceRecordSets",
+      "route53:GetChange",
+      "route53:GetHostedZone",
+      "route53:ListHostedZones",
+      "route53:ListResourceRecordSets"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
     sid    = "AccessTerraformState"
     effect = "Allow"
     actions = [
