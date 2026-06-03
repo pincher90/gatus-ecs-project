@@ -160,6 +160,8 @@ After the destroy workflow has run, the Cloudflare delegation and Route 53 hoste
 - ECR
 - Application Load Balancer
 - ACM
+- Route 53
+- Cloudflare
 - CloudWatch Logs
 - S3 remote state
 - Terraform
@@ -241,7 +243,7 @@ The bootstrap order is:
 
 1. Create or choose an S3 bucket for Terraform state.
 2. Configure AWS credentials locally with permission to create IAM roles and the GitHub OIDC provider.
-3. Apply the OIDC layer:
+3. Apply the bootstrap layer:
 
 ```bash
 cd infra/bootstrap
@@ -275,13 +277,13 @@ terraform destroy \
 
 Or use the `Destroy ECS Infrastructure` workflow in GitHub Actions. It is manual only and requires typing `destroy` into the confirmation box before Terraform runs a destroy plan and applies it.
 
-The OIDC layer is intentionally separate from the main app infrastructure. Keeping it separate means CI/CD access can survive app teardown, which avoids breaking GitHub Actions every time the ECS environment is destroyed.
+The bootstrap layer is intentionally separate from the main app infrastructure. Keeping it separate means CI/CD access can survive app teardown, which avoids breaking GitHub Actions every time the ECS environment is destroyed.
 
 ## Deployment Flow
 
 ### 1. Bootstrap GitHub Actions OIDC
 
-The OIDC bootstrap layer creates the IAM roles used by GitHub Actions:
+The bootstrap layer creates the GitHub OIDC provider and IAM roles used by GitHub Actions:
 
 - `gatus-github-ecr-role` for Docker image pushes to ECR.
 - `gatus-github-terraform-role` for Terraform deploys.
@@ -321,6 +323,8 @@ terraform -chdir=infra apply \
 ```
 
 The placeholder image tag is only needed because Terraform variables are required. The targeted ECR apply does not use the image tag.
+
+The ECR repository has immutable tags, scan on push, KMS encryption, and `force_delete` enabled so the destroy workflow can remove the app layer cleanly even when images exist.
 
 ### 4. Build and Push the Container Image
 
@@ -422,8 +426,8 @@ Terraform CI currently runs:
 - `terraform fmt -check -recursive`
 - `terraform init -backend=false` for the app infrastructure
 - `terraform validate` for the app infrastructure
-- `terraform init -backend=false` for the OIDC bootstrap layer
-- `terraform validate` for the OIDC bootstrap layer
+- `terraform init -backend=false` for the bootstrap layer
+- `terraform validate` for the bootstrap layer
 - `tflint`
 - `checkov`
 
@@ -457,7 +461,7 @@ The ECS deploy workflow has passed with GitHub Actions OIDC authentication, Terr
 
 ### Destroy Workflow
 
-The destroy workflow has passed after a manual confirmation. It ran Terraform destroy for the app infrastructure while leaving the separate OIDC bootstrap layer in place.
+The destroy workflow has passed after a manual confirmation. It ran Terraform destroy for the app infrastructure while leaving the separate bootstrap layer in place.
 
 ![Destroy workflow passing](docs/screenshots/destroy-workflow-success.png)
 
@@ -470,6 +474,8 @@ Before teardown, the deployed AWS resources were also checked from the AWS side:
 - ALB listener `HTTP:80` redirects to `HTTPS:443`.
 - ALB listener `HTTPS:443` forwards traffic to target group `gatus-tg`.
 - Target group `gatus-tg` had one healthy ECS task target on port `8080`.
+- The ALB security group allows public `80` and `443` traffic, then sends only port `8080` traffic toward ECS.
+- The ECS task security group allows inbound `8080` only from the ALB security group, with outbound HTTPS and DNS access via the NAT Gateway.
 - The HTTPS endpoint `https://gatus.appjojocloud.com` returned `200`.
 
 ![ALB target group healthy](docs/screenshots/target-group-healthy.png)
