@@ -2,9 +2,9 @@
 
 This project runs [Gatus](https://github.com/TwiN/gatus) on AWS ECS Fargate with Terraform and GitHub Actions.
 
-It follows the full deployment path from code to a working HTTPS service: Terraform provisions the AWS resources, GitHub Actions builds and pushes the container image, and Cloudflare delegates `gatus.appjojocloud.com` to Route 53 for application DNS.
+It shows the path from code to a working HTTPS service: Terraform provisions the AWS resources, GitHub Actions builds and pushes the container image, and Cloudflare delegates `gatus.appjojocloud.com` to Route 53 for application DNS.
 
-The first version is focused on the core pieces needed for a real ECS deployment: private ECS tasks, a public ALB, TLS, ECR, CloudWatch logs, remote Terraform state, and GitHub Actions OIDC instead of long lived AWS keys.
+The project keeps the first working setup small enough to follow while still covering the core ECS pieces: private ECS tasks, a public ALB, TLS, ECR, CloudWatch logs, remote Terraform state, and GitHub Actions OIDC instead of long lived AWS keys.
 
 ## Table of Contents
 
@@ -85,7 +85,7 @@ After the destroy workflow has run, the Cloudflare delegation and Route 53 hoste
 - HTTP listener on port `80` redirecting to HTTPS.
 - HTTPS listener on port `443` forwarding to the ECS target group.
 - Terraform-managed ACM certificate validation through Route 53.
-- Optional public access protections and network logging can be added later as a hardening phase.
+- Public access protections and network logging can be added later as a hardening phase.
 
 ### Image Build and Delivery
 
@@ -496,7 +496,7 @@ Issues worked through during the build include:
 - Bootstrapping ECR before the first Docker image push.
 - Delegating the application subdomain from Cloudflare to Route 53 for ACM validation and ALB DNS.
 - Wiring an HTTPS only ALB flow to private ECS Fargate tasks.
-- Keeping the first working version intentionally minimal so the deployment path is easy to understand.
+- Keeping the first working version small so the deployment path is easy to understand.
 - Handling Checkov findings with explicit rationale where appropriate.
 
 ## Future Plans
@@ -504,10 +504,10 @@ Issues worked through during the build include:
 - Adding more meaningful internal and external Gatus checks.
 - Adding ECS autoscaling policies.
 - Considering VPC endpoints to reduce NAT dependency.
-- Adding optional public access protection and deeper network logging as a later hardening phase.
+- Adding public access protection and deeper network logging as a later hardening phase.
 - Splitting environments beyond the current dev setup.
 - Documenting the operational runbook for releases and rollbacks.
 
 ## Why This Project
 
-This project shows an end to end ECS deployment built with Terraform and GitHub Actions. It covers the infrastructure and release workflow a small production service needs: private networking, ECS Fargate, IAM, ECR, ALB routing, TLS, GitHub Actions OIDC, image scanning, Terraform checks, and the day to day troubleshooting that comes with wiring everything together.
+This project shows an ECS deployment built with Terraform and GitHub Actions. It covers the infrastructure and release workflow a small production service needs: private networking, ECS Fargate, IAM, ECR, ALB routing, TLS, GitHub Actions OIDC, image scanning, Terraform checks, and the troubleshooting that comes with wiring everything together.
